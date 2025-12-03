@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>아폴로 - 뽑아먹는 변증 문답</title>
+    <title>변증톡 - 뽑아먹는 변증 문답</title>
     <style>
         /* [스타일 정의] 카카오톡 테마 기반 UI */
         :root {
@@ -31,7 +31,7 @@
             overflow: hidden; 
         }
 
-        /* 앱 컨테이너 (모바일 화면 비율 유지) */
+        /* 앱 컨테이너 */
         #app-container {
             width: 100%;
             max-width: 500px;
@@ -64,13 +64,19 @@
             font-size: 20px;
             cursor: pointer;
             display: none; /* 메인에서는 숨김 */
+            padding: 5px;
         }
 
-        .icons span {
-            font-size: 18px;
-            margin-left: 15px;
+        /* 홈(인스타) 아이콘 스타일 */
+        .home-icon {
+            font-size: 24px;
+            text-decoration: none;
             cursor: pointer;
-            opacity: 0.7;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .home-icon:active {
+            opacity: 0.5;
         }
 
         /* 메인: 카테고리 리스트 스타일 */
@@ -93,10 +99,18 @@
             background-color: #f5f5f5;
         }
 
+        /* 해피스트(외부링크) 전용 스타일 */
+        .chat-row.link-item {
+            background-color: #fffbfb; /* 살짝 다른 배경색 */
+        }
+        .chat-row.link-item .chat-name {
+            color: #d95050; /* 강조 색상 */
+        }
+
         .profile-img {
             width: 48px;
             height: 48px;
-            border-radius: 18px; /* 카톡 프로필 느낌 */
+            border-radius: 18px; 
             background-color: #eee;
             display: flex;
             justify-content: center;
@@ -130,7 +144,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            display: none; /* 초기에는 숨김 */
+            display: none; 
             background-color: var(--bg-color);
             flex-direction: column;
             gap: 15px;
@@ -155,7 +169,7 @@
             word-break: keep-all;
         }
 
-        /* 질문 말풍선 (왼쪽) */
+        /* 질문 말풍선 */
         .msg.question {
             align-self: flex-start;
             background-color: var(--other-bubble);
@@ -164,7 +178,6 @@
             animation: slideInLeft 0.3s ease;
         }
         
-        /* 질문 앞 'Q' 표시 */
         .msg.question::before {
             content: 'Q';
             position: absolute;
@@ -175,12 +188,12 @@
             font-size: 12px;
         }
 
-        /* 답변 말풍선 (오른쪽) */
+        /* 답변 말풍선 */
         .msg.answer {
             align-self: flex-end;
             background-color: var(--my-bubble);
             border-top-right-radius: 2px;
-            display: none; /* 클릭 전 숨김 */
+            display: none; 
             cursor: pointer;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -230,7 +243,7 @@
             background: rgba(0,0,0,0.5);
             display: none;
             justify-content: center;
-            align-items: flex-end; /* 바텀 시트 형태 */
+            align-items: flex-end; 
             z-index: 50;
         }
 
@@ -238,7 +251,7 @@
             background: #fff;
             width: 100%;
             max-width: 500px;
-            max-height: 85vh; /* 화면의 85% 높이까지만 */
+            max-height: 85vh; 
             border-radius: 20px 20px 0 0;
             padding: 25px 20px;
             overflow-y: auto;
@@ -262,7 +275,7 @@
             font-size: 15px;
             line-height: 1.65;
             color: #333;
-            white-space: pre-wrap; /* 줄바꿈 유지 */
+            white-space: pre-wrap; 
             padding-bottom: 20px;
         }
 
@@ -296,12 +309,11 @@
         <header>
             <div style="display: flex; align-items: center;">
                 <span class="back-btn" onclick="goHome()">&#10094;</span>
-                <span class="header-title" id="page-title">아폴로 (30)</span>
+                <span class="header-title" id="page-title">변증톡 (30)</span>
             </div>
-            <div class="icons">
-                <span>&#128269;</span>
-                <span>&#9881;</span>
-            </div>
+            <a href="https://www.instagram.com/onnuri_sns/" class="home-icon" title="온누리 SNS 바로가기">
+                🏠
+            </a>
         </header>
 
         <div id="category-list">
@@ -324,10 +336,7 @@
     </div>
 
     <script>
-        /* * [데이터 영역] 
-         * 30개의 모든 질문(q), 짧은 답(a), 긴 답(long) 데이터입니다.
-         * cat: 카테고리 ID (0~5)
-         */
+        /* [데이터 영역] */
         const qnaData = [
             // --- 1. 신 존재 & 과학 (cat: 0) ---
             { 
@@ -529,7 +538,9 @@
             { id: 2, icon: "⚖️", title: "인간, 죄, 윤리" },
             { id: 3, icon: "☔", title: "고통, 악, 삶" },
             { id: 4, icon: "☁️", title: "구원, 천국, 죽음" },
-            { id: 5, icon: "❤️", title: "신앙, 실천, 관계" }
+            { id: 5, icon: "❤️", title: "신앙, 실천, 관계" },
+            // 마지막 항목: 외부 링크 전용
+            { id: 99, icon: "😊", title: "친구와 더 길게 대화하기(해피스트)", type: "link", url: "https://happiest.onnurisns.com" }
         ];
 
         /* [로직 영역] */
@@ -545,13 +556,28 @@
             categories.forEach(cat => {
                 const row = document.createElement('div');
                 row.className = 'chat-row';
-                row.onclick = () => openChatRoom(cat.id);
+                
+                // 링크 항목일 경우 스타일 추가
+                if(cat.type === 'link') {
+                    row.classList.add('link-item');
+                }
+
+                // 클릭 이벤트 분기
+                row.onclick = () => {
+                    if (cat.type === 'link') {
+                        // 외부 페이지로 이동
+                        window.location.href = cat.url;
+                    } else {
+                        // 채팅방 열기
+                        openChatRoom(cat.id);
+                    }
+                };
                 
                 row.innerHTML = `
                     <div class="profile-img">${cat.icon}</div>
                     <div class="chat-info">
                         <div class="chat-name">${cat.title}</div>
-                        <div class="chat-preview">여기를 눌러 질문들을 확인해보세요!</div>
+                        <div class="chat-preview">${cat.type === 'link' ? '여기를 눌러 친구와 대화를 시작해보세요!' : '여기를 눌러 질문들을 확인해보세요!'}</div>
                     </div>
                 `;
                 list.appendChild(row);
@@ -566,7 +592,7 @@
             
             // 헤더 변경
             document.querySelector('.back-btn').style.display = 'block';
-            document.querySelector('.icons').style.visibility = 'hidden';
+            document.querySelector('.home-icon').style.visibility = 'hidden'; // 홈 아이콘 숨김
             const cat = categories.find(c => c.id === catId);
             document.getElementById('page-title').innerText = cat.title;
 
@@ -575,29 +601,26 @@
             chatRoom.innerHTML = ""; 
 
             questions.forEach(item => {
-                // 그룹 생성
                 const group = document.createElement('div');
                 group.className = 'message-group';
 
-                // 1. 질문 (왼쪽)
+                // 질문
                 const qDiv = document.createElement('div');
                 qDiv.className = 'msg question';
                 qDiv.innerText = item.q;
                 qDiv.onclick = () => toggleAnswer(item.id);
                 group.appendChild(qDiv);
 
-                // 2. 답변 (오른쪽, 숨김)
+                // 답변
                 const aDiv = document.createElement('div');
                 aDiv.className = 'msg answer';
                 aDiv.id = `ans-${item.id}`;
                 
-                // 답변 내용 + 자세히 보기 버튼
                 aDiv.innerHTML = `
                     ${item.a}
                     <button class="detail-btn" onclick="openDetail(${item.id}, event)">🧐 더 자세히 보기</button>
                 `;
                 
-                // 말풍선 클릭 시 복사 (버튼 제외)
                 aDiv.onclick = (e) => {
                     if(e.target.className !== 'detail-btn') {
                         copyText(item.a);
@@ -616,11 +639,11 @@
             document.getElementById('chat-room').style.display = 'none';
             document.getElementById('category-list').style.display = 'block';
             document.querySelector('.back-btn').style.display = 'none';
-            document.querySelector('.icons').style.visibility = 'visible';
-            document.getElementById('page-title').innerText = "아폴로 (30)";
+            document.querySelector('.home-icon').style.visibility = 'visible'; // 홈 아이콘 표시
+            document.getElementById('page-title').innerText = "변증톡 (30)";
         }
 
-        // 답변 토글 (보이기/숨기기)
+        // 답변 토글
         function toggleAnswer(id) {
             const ans = document.getElementById(`ans-${id}`);
             if (ans.style.display === 'block') {
@@ -630,7 +653,7 @@
             }
         }
 
-        // 텍스트 복사 & 토스트
+        // 복사
         function copyText(text) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast();
@@ -645,17 +668,14 @@
             setTimeout(() => { toast.className = ''; }, 3000);
         }
 
-        // 모달 열기
+        // 모달
         function openDetail(id, event) {
-            event.stopPropagation(); // 부모 클릭 방지
+            event.stopPropagation();
             const item = qnaData.find(d => d.id === id);
-            
-            // 모달 내용 주입
             document.getElementById('modal-text').innerText = item.long;
             document.getElementById('detail-modal').style.display = 'flex';
         }
 
-        // 모달 닫기
         function closeModal() {
             document.getElementById('detail-modal').style.display = 'none';
         }
