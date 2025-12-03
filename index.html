@@ -23,19 +23,26 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* 전체 스크롤 방지 */
+        }
+
         body {
             background-color: var(--bg-color);
-            height: 100vh;
             display: flex;
             justify-content: center;
-            overflow: hidden; 
         }
 
         /* 앱 컨테이너 */
         #app-container {
             width: 100%;
             max-width: 500px;
-            height: 100%;
+            /* 모바일 브라우저 주소창 대응 (fallback: 100vh) */
+            height: 100vh;
+            height: 100dvh; 
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
@@ -84,6 +91,8 @@
             flex: 1;
             overflow-y: auto;
             background-color: #FFFFFF;
+            /* 스크롤 관성 효과 */
+            -webkit-overflow-scrolling: touch; 
         }
 
         .chat-row {
@@ -149,6 +158,7 @@
             flex-direction: column;
             gap: 15px;
             padding-bottom: 50px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message-group {
@@ -317,10 +327,10 @@
         </header>
 
         <div id="category-list">
-            </div>
+        </div>
 
         <div id="chat-room">
-            </div>
+        </div>
     </div>
 
     <div id="toast">내용이 복사되었습니다. 친구에게 공유해보세요!</div>
@@ -637,6 +647,7 @@
                 chatRoom.appendChild(group);
             });
             
+            // 스크롤 초기화
             chatRoom.scrollTop = 0;
         }
 
@@ -689,9 +700,10 @@
                 if(successful) showToast();
             } catch (err) {
                 console.error('Fallback copy failed', err);
+            } finally {
+                // 어떤 상황에서도 textarea 제거 보장
+                document.body.removeChild(textArea);
             }
-            
-            document.body.removeChild(textArea);
         }
 
         function showToast() {
@@ -709,7 +721,7 @@
             }, 3000);
         }
 
-        // 모달
+        // 모달 열기
         function openDetail(id, event) {
             event.stopPropagation();
             const item = qnaData.find(d => d.id === id);
@@ -717,8 +729,12 @@
             document.getElementById('detail-modal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('detail-modal').style.display = 'none';
+        // 모달 닫기 (이벤트 체크 추가)
+        function closeModal(event) {
+            // event 인자가 없거나(X버튼 클릭 시), event가 있고 target이 overlay일 때만 닫기
+            if (!event || event.target.classList.contains('modal-overlay')) {
+                document.getElementById('detail-modal').style.display = 'none';
+            }
         }
     </script>
 </body>
